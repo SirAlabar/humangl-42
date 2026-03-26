@@ -109,10 +109,10 @@ namespace HumanGL.Rendering
                 }
 
                 byte[] pixels = DecodeBmpPixels(reader, dataOffset, width, height, bpp);
-                UploadToGPU(pixels, Math.Abs(width), Math.Abs(height));
+                UploadToGPU(pixels, System.Math.Abs(width), System.Math.Abs(height));
 
                 Console.WriteLine(
-                    $"Texture: BMP {Math.Abs(width)}x{Math.Abs(height)}" +
+                    $"Texture: BMP {System.Math.Abs(width)}x{System.Math.Abs(height)}" +
                     $" loaded from '{filepath}'"
                 );
                 return true;
@@ -213,7 +213,7 @@ namespace HumanGL.Rendering
             ushort          bpp)
         {
             bool    bottomUp    = height > 0;
-            int     absHeight   = Math.Abs(height);
+            int     absHeight   = System.Math.Abs(height);
             int     bppBytes    = bpp / 8;
             int     rowStride   = ((width * bppBytes + 3) / 4) * 4;
 
@@ -272,7 +272,7 @@ namespace HumanGL.Rendering
 
                 if (maxval == 255)
                 {
-                    Buffer.BlockCopy(raw, 0, pixels, 0, raw.Length);
+                    System.Buffer.BlockCopy(raw, 0, pixels, 0, raw.Length);
                 }
                 else
                 {

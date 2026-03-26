@@ -214,6 +214,23 @@ namespace HumanGL.Math
             };
         }
 
+        /* ── Orthographic projection ─────────────────────────────────────── */
+
+        // Standard orthographic projection for the 2D UI pass.
+        // l/r = left/right clip, b/t = bottom/top clip, near/far = depth range.
+        public static Mat4 Ortho(float l, float r, float b, float t, float near, float far)
+        {
+            Mat4 m = default;
+            m.M00 =  2f / (r - l);
+            m.M11 =  2f / (t - b);
+            m.M22 = -2f / (far - near);
+            m.M03 = -(r + l) / (r - l);
+            m.M13 = -(t + b) / (t - b);
+            m.M23 = -(far + near) / (far - near);
+            m.M33 =  1f;
+            return m;
+        }
+
         /* ── Utility ─────────────────────────────────────────────────────── */
 
         public override string ToString()
