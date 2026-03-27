@@ -37,7 +37,7 @@ namespace HumanGL.Rendering
 
         public void Draw(AppState state, int viewportWidth, int viewportHeight)
         {
-            if (state.Shader == null)
+            if (state.Shader == null || viewportWidth <= 0 || viewportHeight <= 0)
             {
                 return;
             }
