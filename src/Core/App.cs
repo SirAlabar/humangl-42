@@ -3,6 +3,7 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+using HumanGL.Animation;
 using HumanGL.Rendering;
 
 namespace HumanGL
@@ -76,6 +77,11 @@ namespace HumanGL
             _state.Time += dt;
 
             InputHandler.Update(_state, KeyboardState, dt);
+
+            if (_state.Model != null)
+            {
+                Animator.Update(_state.Model, _state, dt);
+            }
         }
 
         /* ── OnRenderFrame ───────────────────────────────────────────────── */
