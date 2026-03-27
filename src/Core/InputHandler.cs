@@ -23,7 +23,7 @@ namespace HumanGL
         {
             HandleAnimationKeys(state, keyboard);
             HandleTextureToggle(state, keyboard);
-            HandleLimbResize(state, keyboard);
+            HandleLimbResize(state, keyboard, dt);
         }
 
         /* ── Mouse events ────────────────────────────────────────────────── */
@@ -93,14 +93,34 @@ namespace HumanGL
             }
         }
 
-        private static void HandleLimbResize(AppState state, KeyboardState keyboard)
+        private const float ResizeSpeed = 0.5f;
+        private const float SizeMin    = 0.05f;
+
+        private static void HandleLimbResize(AppState state, KeyboardState keyboard, float dt)
         {
-            // Tab cycles selected node; +/- adjusts its Y scale
-            // Implemented once HumanModel and BodyNode exist in Phase 3
+            if (state.Model == null)
+            {
+                return;
+            }
+
+            int count = state.Model.AllNodes.Count;
 
             if (keyboard.IsKeyPressed(Keys.Tab))
             {
-                state.SelectedNodeIndex++;
+                state.SelectedNodeIndex = (state.SelectedNodeIndex + 1) % count;
+            }
+
+            Scene.BodyNode node = state.Model.AllNodes[state.SelectedNodeIndex];
+
+            if (keyboard.IsKeyDown(Keys.Equal) || keyboard.IsKeyDown(Keys.KeyPadAdd))
+            {
+                node.Size = new Vec3(node.Size.X, node.Size.Y + ResizeSpeed * dt, node.Size.Z);
+            }
+
+            if (keyboard.IsKeyDown(Keys.Minus) || keyboard.IsKeyDown(Keys.KeyPadSubtract))
+            {
+                float ny = MathF.Max(SizeMin, node.Size.Y - ResizeSpeed * dt);
+                node.Size = new Vec3(node.Size.X, ny, node.Size.Z);
             }
         }
     }

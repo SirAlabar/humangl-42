@@ -1,6 +1,7 @@
 using HumanGL.Math;
 using HumanGL.Rendering;
 using HumanGL.Animation;
+using HumanGL.Scene;
 
 namespace HumanGL
 {
@@ -23,7 +24,7 @@ namespace HumanGL
 
         /* ── Camera ──────────────────────────────────────────────────────── */
 
-        public float    CameraZ     = 6.0f;
+        public float    CameraZ     = 4.0f;
         public float    ManualRotX  = 0f;
         public float    ManualRotY  = 0f;
 
@@ -35,6 +36,10 @@ namespace HumanGL
         /* ── Textures (bonus) ────────────────────────────────────────────── */
 
         public bool     TexturesEnabled  = false;
+
+        /* ── Scene model (set by Renderer.Init) ─────────────────────────── */
+
+        public HumanModel? Model = null;
 
         /* ── UI panel (bonus) ────────────────────────────────────────────── */
 

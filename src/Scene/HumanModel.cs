@@ -7,8 +7,6 @@ using HumanGL.Rendering.Interfaces;
 namespace HumanGL.Scene
 {
     // Builds and owns the skeletal tree.
-    // Phase 2: Torso only.
-    // Phase 3: all 10 mandatory nodes wired up.
 
     public class HumanModel
     {
@@ -27,14 +25,71 @@ namespace HumanGL.Scene
         {
             ITexture noTex = new NullTexture();
 
-            // ── Torso (root) ────────────────────────────────────────────── //
+            // ── Torso (root) ─────────────────────────────────────────────── //
             Root = Add("Torso",
-                offset:  new Vec3( 0.00f,  0.00f, 0f),
-                size:    new Vec3( 0.60f,  0.90f, 0.30f),
+                offset:  new Vec3( 0.00f,  0.00f, 0.00f),
+                size:    new Vec3( 0.50f,  0.95f, 0.30f),
                 colour:  new Vec3( 0.55f,  0.45f, 0.35f),
                 texture: noTex);
 
-            // Phase 3 will add the remaining 9 mandatory nodes here.
+            // ── Head ─────────────────────────────────────────────────────── //
+            Add("Head", Root,
+                offset:  new Vec3( 0.00f,  0.721f, 0.00f),
+                size:    new Vec3( 0.42f,  0.42f, 0.42f),
+                colour:  new Vec3( 0.85f,  0.70f, 0.55f),
+                texture: noTex);
+
+            // ── Left arm ─────────────────────────────────────────────────── //
+            BodyNode lua = Add("LeftUpperArm", Root,
+                offset:  new Vec3(-0.68f,  0.211f, 0.00f),
+                size:    new Vec3( 0.18f,  0.55f, 0.18f),
+                colour:  new Vec3( 0.25f,  0.40f, 0.75f),
+                texture: noTex);
+
+            Add("LeftForeArm", lua,
+                offset:  new Vec3( 0.00f, -1.00f, 0.00f),
+                size:    new Vec3( 0.18f,  0.55f, 0.18f),
+                colour:  new Vec3( 0.35f,  0.55f, 0.85f),
+                texture: noTex);
+
+            // ── Right arm ────────────────────────────────────────────────── //
+            BodyNode rua = Add("RightUpperArm", Root,
+                offset:  new Vec3( 0.68f,  0.211f, 0.00f),
+                size:    new Vec3( 0.18f,  0.55f, 0.18f),
+                colour:  new Vec3( 0.75f,  0.25f, 0.25f),
+                texture: noTex);
+
+            Add("RightForeArm", rua,
+                offset:  new Vec3( 0.00f, -1.00f, 0.00f),
+                size:    new Vec3( 0.18f,  0.55f, 0.18f),
+                colour:  new Vec3( 0.85f,  0.40f, 0.40f),
+                texture: noTex);
+
+            // ── Left leg ─────────────────────────────────────────────────── //
+            BodyNode lt = Add("LeftThigh", Root,
+                offset:  new Vec3(-0.28f, -0.842f, 0.00f),
+                size:    new Vec3( 0.22f,  0.65f, 0.22f),
+                colour:  new Vec3( 0.30f,  0.30f, 0.45f),
+                texture: noTex);
+
+            Add("LeftShin", lt,
+                offset:  new Vec3( 0.00f, -1.00f, 0.00f),
+                size:    new Vec3( 0.22f,  0.65f, 0.22f),
+                colour:  new Vec3( 0.40f,  0.40f, 0.60f),
+                texture: noTex);
+
+            // ── Right leg ────────────────────────────────────────────────── //
+            BodyNode rt = Add("RightThigh", Root,
+                offset:  new Vec3( 0.28f, -0.842f, 0.00f),
+                size:    new Vec3( 0.22f,  0.65f, 0.22f),
+                colour:  new Vec3( 0.30f,  0.30f, 0.45f),
+                texture: noTex);
+
+            Add("RightShin", rt,
+                offset:  new Vec3( 0.00f, -1.00f, 0.00f),
+                size:    new Vec3( 0.22f,  0.65f, 0.22f),
+                colour:  new Vec3( 0.40f,  0.40f, 0.60f),
+                texture: noTex);
         }
 
         /* ── Lookup ──────────────────────────────────────────────────────── */
@@ -51,7 +106,6 @@ namespace HumanGL.Scene
 
         /* ── Private helpers ─────────────────────────────────────────────── */
 
-        // Create a node with no parent (used for root).
         private BodyNode Add(string name, Vec3 offset, Vec3 size, Vec3 colour, ITexture texture)
         {
             BodyNode node = new BodyNode(name, offset, size, colour, texture);
@@ -59,7 +113,6 @@ namespace HumanGL.Scene
             return node;
         }
 
-        // Create a node and attach it as a child of parent.
         private BodyNode Add(string name, BodyNode parent, Vec3 offset, Vec3 size, Vec3 colour, ITexture texture)
         {
             BodyNode node = new BodyNode(name, offset, size, colour, texture);
