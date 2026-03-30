@@ -94,7 +94,7 @@ namespace HumanGL
         }
 
         private const float ResizeSpeed = 0.5f;
-        private const float SizeMin    = 0.05f;
+        private const float SizeMin    = 0.20f;
 
         private static void HandleLimbResize(AppState state, KeyboardState keyboard, float dt)
         {
@@ -103,24 +103,62 @@ namespace HumanGL
                 return;
             }
 
-            int count = state.Model.AllNodes.Count;
+            System.Collections.Generic.List<Scene.BodyNode> limbs =
+                new System.Collections.Generic.List<Scene.BodyNode>();
+
+            foreach (Scene.BodyNode n in state.Model.AllNodes)
+            {
+                if (n.Parent == null || n.Parent.Parent == null)
+                {
+                    limbs.Add(n);
+                }
+            }
 
             if (keyboard.IsKeyPressed(Keys.Tab))
             {
-                state.SelectedNodeIndex = (state.SelectedNodeIndex + 1) % count;
+                state.SelectedNodeIndex = (state.SelectedNodeIndex + 1) % limbs.Count;
             }
 
-            Scene.BodyNode node = state.Model.AllNodes[state.SelectedNodeIndex];
+            Scene.BodyNode node = limbs[state.SelectedNodeIndex];
 
             if (keyboard.IsKeyDown(Keys.Equal) || keyboard.IsKeyDown(Keys.KeyPadAdd))
             {
-                node.Size = new Vec3(node.Size.X, node.Size.Y + ResizeSpeed * dt, node.Size.Z);
+                ResizeChain(node, +ResizeSpeed * dt);
             }
 
             if (keyboard.IsKeyDown(Keys.Minus) || keyboard.IsKeyDown(Keys.KeyPadSubtract))
             {
-                float ny = MathF.Max(SizeMin, node.Size.Y - ResizeSpeed * dt);
-                node.Size = new Vec3(node.Size.X, ny, node.Size.Z);
+                ResizeChain(node, -ResizeSpeed * dt);
+            }
+        }
+
+        private static void ResizeChain(Scene.BodyNode node, float delta)
+        {
+            float ny = MathF.Max(SizeMin, node.Size.Y + delta);
+            node.Size = new Vec3(node.Size.X, ny, node.Size.Z);
+
+            foreach (Scene.BodyNode child in node.Children)
+            {
+                ResizeAndReattach(node, child, delta);
+            }
+        }
+
+        private static void ResizeAndReattach(Scene.BodyNode parent, Scene.BodyNode child, float delta)
+        {
+            float ny = MathF.Max(SizeMin, child.Size.Y + delta);
+            child.Size = new Vec3(child.Size.X, ny, child.Size.Z);
+
+            if (child.LocalOffset.X == 0f && child.LocalOffset.Z == 0f && child.LocalOffset.Y < 0f)
+            {
+                child.LocalOffset = new Vec3(
+                    0f,
+                    -0.5f * (1f + child.Size.Y / parent.Size.Y),
+                    0f);
+            }
+
+            foreach (Scene.BodyNode grandchild in child.Children)
+            {
+                ResizeAndReattach(child, grandchild, delta);
             }
         }
     }
