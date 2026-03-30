@@ -20,6 +20,7 @@ namespace HumanGL.Animation
             {
                 { AnimationState.Idle, new IdleState() },
                 { AnimationState.Walk, new WalkState() },
+                { AnimationState.Jump, new JumpState() },
             };
 
         /* ── Runtime ─────────────────────────────────────────────────────── */
