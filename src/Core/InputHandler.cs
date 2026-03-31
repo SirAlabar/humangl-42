@@ -134,8 +134,7 @@ namespace HumanGL
 
         private static void ResizeChain(Scene.BodyNode node, float delta)
         {
-            float ny = MathF.Max(SizeMin, node.Size.Y + delta);
-            node.Size = new Vec3(node.Size.X, ny, node.Size.Z);
+            ApplyResize(node, delta);
 
             foreach (Scene.BodyNode child in node.Children)
             {
@@ -143,16 +142,41 @@ namespace HumanGL
             }
         }
 
+        // Scale a single node's Size. Head scales uniformly to preserve proportions.
+        private static void ApplyResize(Scene.BodyNode node, float delta)
+        {
+            float ny = MathF.Max(SizeMin, node.Size.Y + delta);
+            if (node.Name == "Head")
+            {
+                float ratio = node.Size.Y > 0f ? ny / node.Size.Y : 1f;
+                node.Size = new Vec3(node.Size.X * ratio, ny, node.Size.Z * ratio);
+            }
+            else
+            {
+                node.Size = new Vec3(node.Size.X, ny, node.Size.Z);
+            }
+        }
+
         private static void ResizeAndReattach(Scene.BodyNode parent, Scene.BodyNode child, float delta)
         {
-            float ny = MathF.Max(SizeMin, child.Size.Y + delta);
-            child.Size = new Vec3(child.Size.X, ny, child.Size.Z);
+            ApplyResize(child, delta);
 
-            if (child.LocalOffset.X == 0f && child.LocalOffset.Z == 0f && child.LocalOffset.Y < 0f)
+            if (child.LocalOffset.Y < 0f)
             {
+                // Chain child below parent (arms, legs, hands, feet).
+                // Recompute Y, preserve X and Z offsets.
+                child.LocalOffset = new Vec3(
+                    child.LocalOffset.X,
+                    -0.5f * (1f + child.Size.Y / parent.Size.Y),
+                    child.LocalOffset.Z);
+            }
+            else if (child.LocalOffset.Y > 0f && child.LocalOffset.X == 0f && child.LocalOffset.Z == 0f)
+            {
+                // Top-attached child (Neck on Torso, Head on Neck).
+                // Keep bottom flush with parent top.
                 child.LocalOffset = new Vec3(
                     0f,
-                    -0.5f * (1f + child.Size.Y / parent.Size.Y),
+                    0.5f * (1f + child.Size.Y / parent.Size.Y),
                     0f);
             }
 
