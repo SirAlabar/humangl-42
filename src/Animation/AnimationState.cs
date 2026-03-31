@@ -6,7 +6,7 @@ namespace HumanGL.Animation
         Walk   = 1,
         Jump   = 2,
         Disco  = 3,
-        KungFu = 4,
+        Karate = 4,
         TPose  = 5
     }
 }

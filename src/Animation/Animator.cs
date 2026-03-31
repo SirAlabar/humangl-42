@@ -22,7 +22,7 @@ namespace HumanGL.Animation
                 { AnimationState.Walk,   new WalkState()   },
                 { AnimationState.Jump,   new JumpState()   },
                 { AnimationState.Disco,  new DiscoState()  },
-                { AnimationState.KungFu, new KungFuState() },
+                { AnimationState.Karate, new KarateState() },
                 { AnimationState.TPose,  new TPoseState()  },
             };
 

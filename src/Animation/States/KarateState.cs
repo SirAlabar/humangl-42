@@ -22,7 +22,7 @@ namespace HumanGL.Animation.States
     //   • Easing: EaseOut on strikes, EaseInOut on movement
     //   • TorsoOffsetZ for forward progression
 
-    public class KungFuState : AnimationStateBase
+    public class KarateState : AnimationStateBase
     {
         /* ── Phase boundaries (absolute seconds) ────────────────────────── */
 

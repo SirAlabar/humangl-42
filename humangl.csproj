@@ -13,6 +13,7 @@
   <ItemGroup>
     <!-- OpenTK: window + events + raw OpenGL bindings only -->
     <PackageReference Include="OpenTK" Version="4.8.2" />
+    <PackageReference Include="StbImageSharp" Version="2.30.15" />
   </ItemGroup>
 
 </Project>

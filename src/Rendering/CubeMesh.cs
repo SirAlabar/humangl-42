@@ -28,6 +28,18 @@ namespace HumanGL.Rendering
             Build();
         }
 
+        // Build a cube whose UVs sample a face-atlas texture.
+        // Layout expected (4 columns × 3 rows):
+        //        [ top  ]
+        // [left ][front ][right ][ back ]
+        //        [ btm  ]
+        public static CubeMesh CreateHeadAtlas()
+        {
+            CubeMesh m = new CubeMesh();
+            m.BuildAtlas();
+            return m;
+        }
+
         /* ── Draw ────────────────────────────────────────────────────────── */
 
         public void Draw()
@@ -146,6 +158,78 @@ namespace HumanGL.Rendering
                 stride:     5 * sizeof(float),
                 offset:     3 * sizeof(float));
 
+            GL.BindVertexArray(0);
+        }
+
+        // Rebuilds the existing VAO/VBO with atlas UVs for the head face texture.
+        // Each face samples its own region of the 4×3 atlas.
+        // UV origin is bottom-left (OpenGL convention). Image is pre-flipped on load.
+        //
+        // After vertical flip on load, atlas rows in UV space:
+        //   original top    row → UV y = [0.667, 1.000]
+        //   original middle row → UV y = [0.333, 0.667]
+        //   original bottom row → UV y = [0.000, 0.333]
+        // Atlas columns: left=0, front=1, right=2, back=3 → x = col/4 .. (col+1)/4
+        private void BuildAtlas()
+        {
+            const float W = 1f / 4f;  // cell width
+            const float H = 1f / 3f;  // cell height
+
+            // col × row for each face (image layout, pre-flip)
+            // After flip: UV_y_min = 1 - (row+1)*H,  UV_y_max = 1 - row*H
+            float FrontX0 = 1 * W, FrontX1 = 2 * W, FrontY0 = H,   FrontY1 = 2 * H; // col1 row1
+            float BackX0  = 3 * W, BackX1  = 4 * W, BackY0  = H,   BackY1  = 2 * H; // col3 row1
+            float LeftX0  = 0 * W, LeftX1  = 1 * W, LeftY0  = H,   LeftY1  = 2 * H; // col0 row1
+            float RightX0 = 2 * W, RightX1 = 3 * W, RightY0 = H,   RightY1 = 2 * H; // col2 row1
+            float TopX0   = 1 * W, TopX1   = 2 * W, TopY0   = 2*H, TopY1   = 3 * H; // col1 row0 → top in UV
+            float BotX0   = 1 * W, BotX1   = 2 * W, BotY0   = 0,   BotY1   = H;     // col1 row2 → bottom in UV
+
+            float[] vertices =
+            {
+                // +Z (front face of head)
+                -0.5f, -0.5f,  0.5f,   FrontX0, FrontY0,
+                 0.5f, -0.5f,  0.5f,   FrontX1, FrontY0,
+                 0.5f,  0.5f,  0.5f,   FrontX1, FrontY1,
+                -0.5f,  0.5f,  0.5f,   FrontX0, FrontY1,
+
+                // -Z (back of head)
+                 0.5f, -0.5f, -0.5f,   BackX0, BackY0,
+                -0.5f, -0.5f, -0.5f,   BackX1, BackY0,
+                -0.5f,  0.5f, -0.5f,   BackX1, BackY1,
+                 0.5f,  0.5f, -0.5f,   BackX0, BackY1,
+
+                // -X (left side of head)
+                -0.5f, -0.5f, -0.5f,   LeftX0, LeftY0,
+                -0.5f, -0.5f,  0.5f,   LeftX1, LeftY0,
+                -0.5f,  0.5f,  0.5f,   LeftX1, LeftY1,
+                -0.5f,  0.5f, -0.5f,   LeftX0, LeftY1,
+
+                // +X (right side of head)
+                 0.5f, -0.5f,  0.5f,   RightX0, RightY0,
+                 0.5f, -0.5f, -0.5f,   RightX1, RightY0,
+                 0.5f,  0.5f, -0.5f,   RightX1, RightY1,
+                 0.5f,  0.5f,  0.5f,   RightX0, RightY1,
+
+                // +Y (top of head)
+                -0.5f,  0.5f,  0.5f,   TopX0, TopY0,
+                 0.5f,  0.5f,  0.5f,   TopX1, TopY0,
+                 0.5f,  0.5f, -0.5f,   TopX1, TopY1,
+                -0.5f,  0.5f, -0.5f,   TopX0, TopY1,
+
+                // -Y (bottom/chin)
+                -0.5f, -0.5f, -0.5f,   BotX0, BotY0,
+                 0.5f, -0.5f, -0.5f,   BotX1, BotY0,
+                 0.5f, -0.5f,  0.5f,   BotX1, BotY1,
+                -0.5f, -0.5f,  0.5f,   BotX0, BotY1,
+            };
+
+            GL.BindVertexArray(_vao);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _vbo);
+            GL.BufferData(
+                BufferTarget.ArrayBuffer,
+                vertices.Length * sizeof(float),
+                vertices,
+                BufferUsageHint.StaticDraw);
             GL.BindVertexArray(0);
         }
     }

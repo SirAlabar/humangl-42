@@ -69,7 +69,7 @@ namespace HumanGL
             if (keyboard.IsKeyPressed(Keys.D2)) { SwitchAnimation(state, AnimationState.Walk);   }
             if (keyboard.IsKeyPressed(Keys.D3)) { SwitchAnimation(state, AnimationState.Jump);   }
             if (keyboard.IsKeyPressed(Keys.D4)) { SwitchAnimation(state, AnimationState.Disco);  }
-            if (keyboard.IsKeyPressed(Keys.D5)) { SwitchAnimation(state, AnimationState.KungFu); }
+            if (keyboard.IsKeyPressed(Keys.D5)) { SwitchAnimation(state, AnimationState.Karate); }
             if (keyboard.IsKeyPressed(Keys.D6)) { SwitchAnimation(state, AnimationState.TPose);  }
         }
 

@@ -4,6 +4,7 @@ using System.Text;
 using HumanGL.Rendering.Interfaces;
 using HumanGL.Utils;
 using OpenTK.Graphics.OpenGL4;
+using StbImageSharp;
 
 namespace HumanGL.Rendering
 {
@@ -38,6 +39,12 @@ namespace HumanGL.Rendering
             else if (ext == ".ppm")
             {
                 ok = texture.LoadPPM(filepath);
+            }
+            else if (ext == ".png"  || ext == ".jpg" || ext == ".jpeg" ||
+                     ext == ".tga"  || ext == ".gif" || ext == ".hdr"  ||
+                     ext == ".psd"  || ext == ".pic")
+            {
+                ok = texture.LoadStb(filepath);
             }
             else
             {
@@ -111,15 +118,48 @@ namespace HumanGL.Rendering
                 byte[] pixels = DecodeBmpPixels(reader, dataOffset, width, height, bpp);
                 UploadToGPU(pixels, System.Math.Abs(width), System.Math.Abs(height));
 
-                Console.WriteLine(
-                    $"Texture: BMP {System.Math.Abs(width)}x{System.Math.Abs(height)}" +
-                    $" loaded from '{filepath}'"
-                );
                 return true;
             }
             catch (Exception ex)
             {
                 Console.Error.WriteLine($"Texture: failed to load BMP '{filepath}': {ex.Message}");
+                return false;
+            }
+        }
+
+        /* ── PNG / JPG loader (via StbImageSharp) ───────────────────────── */
+
+        public bool LoadStb(string filepath)
+        {
+            if (!FileValidator.Validate(filepath, "Texture"))
+            {
+                return false;
+            }
+
+            try
+            {
+                // Do NOT call stbi_set_flip_vertically_on_load — it segfaults on some drivers.
+                // Flip rows manually in software instead.
+                using Stream stream = File.OpenRead(filepath);
+                ImageResult image   = ImageResult.FromStream(stream, ColorComponents.RedGreenBlue);
+
+                int    w       = image.Width;
+                int    h       = image.Height;
+                byte[] src     = image.Data;
+                byte[] flipped = new byte[src.Length];
+                int    stride  = w * 3;
+
+                for (int y = 0; y < h; y++)
+                {
+                    System.Buffer.BlockCopy(src, (h - 1 - y) * stride, flipped, y * stride, stride);
+                }
+
+                UploadToGPU(flipped, w, h);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Texture: failed to load '{filepath}': {ex.Message}");
                 return false;
             }
         }
@@ -158,7 +198,6 @@ namespace HumanGL.Rendering
                 byte[] pixels = DecodePpmPixels(reader, magic, width, height, maxval);
                 UploadToGPU(pixels, width, height);
 
-                Console.WriteLine($"Texture: PPM {width}x{height} loaded from '{filepath}'");
                 return true;
             }
             catch (Exception ex)

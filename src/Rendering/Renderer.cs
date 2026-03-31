@@ -19,6 +19,7 @@ namespace HumanGL.Rendering
         /* ── Fields ──────────────────────────────────────────────────────── */
 
         private CubeMesh    _cubeMesh = null!;
+        private CubeMesh    _headMesh = null!;   // atlas UVs for 6-face head texture
         private HumanModel  _model    = null!;
         private MatrixStack _stack    = null!;
         private bool        _disposed;
@@ -28,9 +29,12 @@ namespace HumanGL.Rendering
         public void Init(AppState state)
         {
             _cubeMesh   = new CubeMesh();
+            _headMesh   = CubeMesh.CreateHeadAtlas();
             _model      = new HumanModel();
             _stack      = new MatrixStack();
             state.Model = _model;
+
+            ModelTextureLoader.Load(_model, "assets/textures");
         }
 
         /* ── Draw ────────────────────────────────────────────────────────── */
@@ -63,7 +67,6 @@ namespace HumanGL.Rendering
 
             state.Shader.SetMat4("u_view",       view);
             state.Shader.SetMat4("u_projection", proj);
-            state.Shader.SetInt ("u_useTexture",  state.TexturesEnabled ? 1 : 0);
 
             _stack.Reset();
             _stack.Multiply(Mat4.RotateX(state.ManualRotX));
@@ -90,11 +93,14 @@ namespace HumanGL.Rendering
             _stack.Multiply(Mat4.RotateY(node.RotationY));
             _stack.Multiply(Mat4.RotateZ(node.RotationZ));
 
-            Mat4 drawMatrix = _stack.Top * Mat4.Scale(node.Size);
-            state.Shader.SetMat4("u_model",  drawMatrix);
-            state.Shader.SetVec3("u_colour", node.Colour);
+            Mat4     drawMatrix = _stack.Top * Mat4.Scale(node.Size);
+            bool     useTex    = state.TexturesEnabled && node.Texture.IsLoaded;
+            CubeMesh mesh      = node.Name == "Head" ? _headMesh : _cubeMesh;
+            state.Shader.SetMat4("u_model",     drawMatrix);
+            state.Shader.SetVec3("u_colour",    node.Colour);
+            state.Shader.SetInt ("u_useTexture", useTex ? 1 : 0);
             node.Texture.Bind(0);
-            _cubeMesh.Draw();
+            mesh.Draw();
             node.Texture.Unbind();
 
             foreach (BodyNode child in node.Children)
@@ -128,6 +134,7 @@ namespace HumanGL.Rendering
             if (!_disposed)
             {
                 _cubeMesh?.Dispose();
+                _headMesh?.Dispose();
                 _disposed = true;
             }
         }
