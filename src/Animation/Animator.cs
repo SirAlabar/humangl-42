@@ -18,9 +18,12 @@ namespace HumanGL.Animation
         private static readonly Dictionary<AnimationState, AnimationStateBase> _states =
             new Dictionary<AnimationState, AnimationStateBase>
             {
-                { AnimationState.Idle, new IdleState() },
-                { AnimationState.Walk, new WalkState() },
-                { AnimationState.Jump, new JumpState() },
+                { AnimationState.Idle,   new IdleState()   },
+                { AnimationState.Walk,   new WalkState()   },
+                { AnimationState.Jump,   new JumpState()   },
+                { AnimationState.Disco,  new DiscoState()  },
+                { AnimationState.KungFu, new KungFuState() },
+                { AnimationState.TPose,  new TPoseState()  },
             };
 
         /* ── Runtime ─────────────────────────────────────────────────────── */
@@ -53,11 +56,11 @@ namespace HumanGL.Animation
 
         /* ── Blend helpers ───────────────────────────────────────────────── */
 
-        // Layout: [node0.rx, node0.ry, node0.rz, node1.rx, ...], then TorsoOffsetY.
+        // Layout: [node0.rx, node0.ry, node0.rz, node1.rx, ...], TorsoOffsetY, TorsoOffsetZ.
         private static void TakeSnapshot(HumanModel model, AppState state)
         {
             IReadOnlyList<BodyNode> nodes = model.AllNodes;
-            _snapshot = new float[nodes.Count * 3 + 1];
+            _snapshot = new float[nodes.Count * 3 + 2];
 
             for (int i = 0; i < nodes.Count; i++)
             {
@@ -66,7 +69,8 @@ namespace HumanGL.Animation
                 _snapshot[i * 3 + 2] = nodes[i].RotationZ;
             }
 
-            _snapshot[nodes.Count * 3] = state.TorsoOffsetY;
+            _snapshot[nodes.Count * 3 + 0] = state.TorsoOffsetY;
+            _snapshot[nodes.Count * 3 + 1] = state.TorsoOffsetZ;
         }
 
         private static void ApplyBlend(HumanModel model, AppState state, float alpha)
@@ -80,7 +84,8 @@ namespace HumanGL.Animation
                 nodes[i].RotationZ = Lerp(_snapshot[i * 3 + 2], nodes[i].RotationZ, alpha);
             }
 
-            state.TorsoOffsetY = Lerp(_snapshot[nodes.Count * 3], state.TorsoOffsetY, alpha);
+            state.TorsoOffsetY = Lerp(_snapshot[nodes.Count * 3 + 0], state.TorsoOffsetY, alpha);
+            state.TorsoOffsetZ = Lerp(_snapshot[nodes.Count * 3 + 1], state.TorsoOffsetZ, alpha);
         }
 
         private static float Lerp(float a, float b, float t) => a + (b - a) * t;

@@ -68,7 +68,7 @@ namespace HumanGL.Rendering
             _stack.Reset();
             _stack.Multiply(Mat4.RotateX(state.ManualRotX));
             _stack.Multiply(Mat4.RotateY(state.ManualRotY));
-            _stack.Multiply(Mat4.Translate(new Vec3(0f, state.TorsoOffsetY, 0f)));
+            _stack.Multiply(Mat4.Translate(new Vec3(0f, state.TorsoOffsetY, state.TorsoOffsetZ)));
 
             DrawNode(_model.Root, Vec3.One, state);
         }

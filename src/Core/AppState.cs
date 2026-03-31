@@ -21,6 +21,7 @@ namespace HumanGL
         public float            Time             = 0f;
         public float            TransitionTimer  = 0f;
         public float            TorsoOffsetY     = 0f;
+        public float            TorsoOffsetZ     = 0f;
 
         /* ── Camera ──────────────────────────────────────────────────────── */
 

@@ -42,6 +42,7 @@ ScaffoldingReadMe.txt
 CodeCoverage/
 extract.sh
 humangl.pdf
+CLAUDE.md
 
 # MSBuild Binary and Structured Log
 *.binlog
