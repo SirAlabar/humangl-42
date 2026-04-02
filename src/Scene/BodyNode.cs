@@ -23,6 +23,11 @@ namespace HumanGL.Scene
         // expressed in pre-scale parent space.
         public Vec3             LocalOffset;
 
+        // True for nodes attached at the parent's top edge with a lateral offset
+        // (upper arms). Stored explicitly so ReattachChild uses the right formula
+        // even when the computed Y offset goes negative (arm taller than torso).
+        public bool             LateralAttach;
+
         // Dimensions of the box drawn for this node (x, y, z scales).
         // Modified live by the UI panel sliders.
         public Vec3             Size;

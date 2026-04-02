@@ -94,7 +94,6 @@ namespace HumanGL
         }
 
         private const float ResizeSpeed = 0.5f;
-        private const float SizeMin    = 0.20f;
 
         private static void HandleLimbResize(AppState state, KeyboardState keyboard, float dt)
         {
@@ -134,55 +133,23 @@ namespace HumanGL
 
         private static void ResizeChain(Scene.BodyNode node, float delta)
         {
-            ApplyResize(node, delta);
+            Scene.NodeResizer.SetSizeY(node, node.Size.Y + delta);
 
             foreach (Scene.BodyNode child in node.Children)
             {
-                ResizeAndReattach(node, child, delta);
+                ResizeChainChild(node, child, delta);
             }
         }
 
-        // Scale a single node's Size. Head scales uniformly to preserve proportions.
-        private static void ApplyResize(Scene.BodyNode node, float delta)
+        // Keyboard cascade: also resizes children (unlike slider independent mode).
+        private static void ResizeChainChild(Scene.BodyNode parent, Scene.BodyNode child, float delta)
         {
-            float ny = MathF.Max(SizeMin, node.Size.Y + delta);
-            if (node.Name == "Head")
-            {
-                float ratio = node.Size.Y > 0f ? ny / node.Size.Y : 1f;
-                node.Size = new Vec3(node.Size.X * ratio, ny, node.Size.Z * ratio);
-            }
-            else
-            {
-                node.Size = new Vec3(node.Size.X, ny, node.Size.Z);
-            }
-        }
-
-        private static void ResizeAndReattach(Scene.BodyNode parent, Scene.BodyNode child, float delta)
-        {
-            ApplyResize(child, delta);
-
-            if (child.LocalOffset.Y < 0f)
-            {
-                // Chain child below parent (arms, legs, hands, feet).
-                // Recompute Y, preserve X and Z offsets.
-                child.LocalOffset = new Vec3(
-                    child.LocalOffset.X,
-                    -0.5f * (1f + child.Size.Y / parent.Size.Y),
-                    child.LocalOffset.Z);
-            }
-            else if (child.LocalOffset.Y > 0f && child.LocalOffset.X == 0f && child.LocalOffset.Z == 0f)
-            {
-                // Top-attached child (Neck on Torso, Head on Neck).
-                // Keep bottom flush with parent top.
-                child.LocalOffset = new Vec3(
-                    0f,
-                    0.5f * (1f + child.Size.Y / parent.Size.Y),
-                    0f);
-            }
+            Scene.NodeResizer.SetSizeY(child, child.Size.Y + delta);
+            Scene.NodeResizer.ReattachChild(parent, child);
 
             foreach (Scene.BodyNode grandchild in child.Children)
             {
-                ResizeAndReattach(child, grandchild, delta);
+                ResizeChainChild(child, grandchild, delta);
             }
         }
     }

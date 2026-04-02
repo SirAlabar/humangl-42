@@ -56,6 +56,7 @@ namespace HumanGL.Scene
                 size:    new Vec3( 0.18f,  0.55f, 0.18f),
                 colour:  new Vec3( 0.25f,  0.40f, 0.75f),
                 texture: noTex);
+            lua.LateralAttach = true;
 
             BodyNode lfa = Add("LeftForeArm", lua,
                 offset:  new Vec3( 0.00f, -1.00f, 0.00f),
@@ -77,6 +78,7 @@ namespace HumanGL.Scene
                 size:    new Vec3( 0.18f,  0.55f, 0.18f),
                 colour:  new Vec3( 0.75f,  0.25f, 0.25f),
                 texture: noTex);
+            rua.LateralAttach = true;
 
             BodyNode rfa = Add("RightForeArm", rua,
                 offset:  new Vec3( 0.00f, -1.00f, 0.00f),

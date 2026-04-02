@@ -32,7 +32,6 @@ namespace HumanGL.Animation.States
             model.GetNode("LeftUpperArm").RotationZ  = -0.40f + beat * -0.20f;
             model.GetNode("LeftForeArm").RotationX   =  beat *  0.30f;
 
-            // RightUpperArm mirrors
             model.GetNode("RightUpperArm").RotationX = -beat * -1.10f;
             model.GetNode("RightUpperArm").RotationZ =  0.40f + beat *  0.20f;
             model.GetNode("RightForeArm").RotationX  = -beat *  0.30f;

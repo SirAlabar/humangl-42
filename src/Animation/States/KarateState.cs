@@ -26,9 +26,9 @@ namespace HumanGL.Animation.States
     {
         /* ── Phase boundaries (absolute seconds) ────────────────────────── */
 
-        private const float Period     = 9.00f;
-        private const float YoiEnd     = 0.80f;
-        private const float Oizuki1End = 2.10f;
+        private const float Period     = 15.00f;
+        private const float YoiEnd     = 1.20f;
+        private const float Oizuki1End = 3.00f;
         private const float Guard1End  = 2.70f;
         private const float GyakuEnd   = 3.80f;
         private const float Guard2End  = 4.40f;

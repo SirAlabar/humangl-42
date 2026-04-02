@@ -5,6 +5,7 @@ using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using HumanGL.Animation;
 using HumanGL.Rendering;
+using HumanGL.UI;
 
 namespace HumanGL
 {
@@ -111,14 +112,25 @@ namespace HumanGL
 
             if (e.Button == MouseButton.Left)
             {
-                InputHandler.OnMouseDown(_state, MousePosition.X, MousePosition.Y);
+                float mx = MousePosition.X;
+                float my = MousePosition.Y;
+                if (!_renderer.Panel.OnMouseDown(mx, my, _state))
+                {
+                    InputHandler.OnMouseDown(_state, mx, my);
+                }
             }
         }
 
         protected override void OnMouseMove(MouseMoveEventArgs e)
         {
             base.OnMouseMove(e);
-            InputHandler.OnMouseMove(_state, e.X, e.Y);
+
+            _renderer.Panel.OnMouseMove(e.X, e.Y, _state);
+
+            if (!_renderer.Panel.IsDragging)
+            {
+                InputHandler.OnMouseMove(_state, e.X, e.Y);
+            }
         }
 
         protected override void OnMouseUp(MouseButtonEventArgs e)
@@ -127,6 +139,7 @@ namespace HumanGL
 
             if (e.Button == MouseButton.Left)
             {
+                _renderer.Panel.OnMouseUp();
                 InputHandler.OnMouseUp(_state);
             }
         }

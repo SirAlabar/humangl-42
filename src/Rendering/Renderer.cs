@@ -2,6 +2,7 @@ using System;
 using OpenTK.Graphics.OpenGL4;
 using HumanGL.Math;
 using HumanGL.Scene;
+using HumanGL.UI;
 
 namespace HumanGL.Rendering
 {
@@ -18,11 +19,15 @@ namespace HumanGL.Rendering
 
         /* ── Fields ──────────────────────────────────────────────────────── */
 
-        private CubeMesh    _cubeMesh = null!;
-        private CubeMesh    _headMesh = null!;   // atlas UVs for 6-face head texture
-        private HumanModel  _model    = null!;
-        private MatrixStack _stack    = null!;
+        private CubeMesh    _cubeMesh  = null!;
+        private CubeMesh    _headMesh  = null!;
+        private HumanModel  _model     = null!;
+        private MatrixStack _stack     = null!;
+        private UiRenderer  _ui        = null!;
+        private UiPanel     _panel     = null!;
         private bool        _disposed;
+
+        public UiPanel Panel => _panel;
 
         /* ── Init ────────────────────────────────────────────────────────── */
 
@@ -35,6 +40,9 @@ namespace HumanGL.Rendering
             state.Model = _model;
 
             ModelTextureLoader.Load(_model, "assets/textures");
+
+            _ui    = new UiRenderer();
+            _panel = new UiPanel();
         }
 
         /* ── Draw ────────────────────────────────────────────────────────── */
@@ -74,6 +82,12 @@ namespace HumanGL.Rendering
             _stack.Multiply(Mat4.Translate(new Vec3(0f, state.TorsoOffsetY, state.TorsoOffsetZ)));
 
             DrawNode(_model.Root, Vec3.One, state);
+
+            // UI pass — drawn on top, depth test disabled inside
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+            _panel.Draw(_ui, state, viewportWidth, viewportHeight);
+            GL.Disable(EnableCap.Blend);
         }
 
         /* ── DrawNode ────────────────────────────────────────────────────── */
@@ -135,6 +149,7 @@ namespace HumanGL.Rendering
             {
                 _cubeMesh?.Dispose();
                 _headMesh?.Dispose();
+                _ui?.Dispose();
                 _disposed = true;
             }
         }

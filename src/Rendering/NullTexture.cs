@@ -12,14 +12,8 @@ namespace HumanGL.Rendering
 
         public bool IsLoaded => false;
 
-        public void Bind(int unit = 0)
-        {
-            // No-op — no texture to bind
-        }
+        public void Bind(int unit = 0) { }
 
-        public void Unbind()
-        {
-            // No-op — nothing was bound
-        }
+        public void Unbind() { }
     }
 }
